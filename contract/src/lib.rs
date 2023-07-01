@@ -148,6 +148,14 @@ impl HealthContract {
         log!("Registered doctor successfully. ID: {}", id);
     }
 
+    // Get all public medical records stored on the chain.
+    pub fn get_public_medical_records(&self) -> Vec<MedicalRecord> {
+        self.public_records
+            .iter()
+            .map(|record_id| self.medical_records.get(record_id).unwrap().clone())
+            .collect()
+    }
+
     // Store a medical record for a patient with the specified ID,
     // record data, and privacy setting.
     #[payable]
