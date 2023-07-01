@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="doctors.css">
+  <link rel="stylesheet" href="/client/styles.css">
+  <link rel="stylesheet" href="doctors_styles/doctors.css">
 </head>
 <body>
 <nav class="fade-in">
@@ -25,7 +25,13 @@
   <section>
     <h2>Welcome, Doctor Name</h2>
   </section>
-
+  <section>
+    <h3>Search Patients</h3>
+    <form id="search-form" action="patient-info.html">
+      <input type="text" id="patient-id" placeholder="Enter Patient's Account Id" required>
+      <button type="submit">Search</button>
+    </form>
+  </section>
   <section>
     <h3>Appointments</h3>
     <div class="appointment-card">
@@ -42,6 +48,8 @@
       </div>
     </div>
   </section>
+
+
 </main>
 <footer class="fade-in">
   <ul class="footer-links">
