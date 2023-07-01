@@ -8,7 +8,6 @@
 <nav class="fade-in">
     <ul class="navigation-bar">
         <li><a href="logout.html">Logout</a></li>
-        <li><a href="patients.html">Patients</a></li>
         <li><a href="med-records.html">MedRecords</a></li>
     </ul>
 </nav>
@@ -23,27 +22,40 @@
 
 <main class="fade-in">
     <section>
-        <h2>Patients</h2>
+        <h2>Patient Information</h2>
+        <div class="patient-details">
+            <p>Name: <span class="patient-name">[Patient Name]</span></p>
+            <p>Age: <span class="patient-age">[Patient Age]</span></p>
+            <p>Gender: <span class="patient-gender">[Patient Gender]</span></p>
+            <p>Address: <span class="patient-address">[Patient Address]</span></p>
+            <!-- Add more patient information here -->
+        </div>
     </section>
 
     <section>
-        <!-- Add patient cards here -->
-        <div class="patient-card">
-            <!-- Example patient card -->
-            <div class="patient-info">
-                <h3>[Patient Name]</h3>
-                <p>Age: [Patient Age]</p>
-                <p>Gender: [Patient Gender]</p>
-                <!-- Add more patient information as needed -->
+        <h3>Upload Medical Records</h3>
+        <form id="upload-form" action="#" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" id="file" accept=".pdf, .doc, .docx">
+            <button type="submit">Upload</button>
+        </form>
+    </section>
+
+    <section>
+        <h3>Medical Records</h3>
+        <div class="medical-records">
+            <!-- Add medical record items here -->
+            <div class="record-item">
+                <p>Record 1</p>
+                <!-- Add more details about the record -->
             </div>
-            <div class="patient-actions">
-                <button class="view-button">View</button>
-                <button class="edit-button">Edit</button>
-                <button class="delete-button">Delete</button>
+            <div class="record-item">
+                <p>Record 2</p>
+                <!-- Add more details about the record -->
             </div>
         </div>
     </section>
 </main>
+
 <footer class="fade-in">
     <ul class="footer-links">
         <li><a href="terms.html">Terms of Service</a></li>
@@ -52,6 +64,7 @@
         <li><a href="contact.html">Contact Us</a></li>
     </ul>
 </footer>
+
 <script>
     // JavaScript code
 </script>

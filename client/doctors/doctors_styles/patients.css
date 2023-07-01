@@ -1,37 +1,24 @@
-
-/* Patient card styles */
-.patient-card {
-    background-color: #f8f8f8;
-    padding: 20px;
+/* Main content */
+section {
     margin-bottom: 20px;
-    border-radius: 5px;
+    padding: 20px;
 }
 
-.patient-info {
+h2, h3 {
     margin-bottom: 10px;
+    color: #8B4513;
 }
 
-.patient-info h3 {
-    font-size: 18px;
+.patient-details p {
     margin: 0;
 }
 
-.patient-actions {
-    display: flex;
-    justify-content: flex-end;
+.upload-form input[type="file"] {
+    margin-bottom: 10px;
 }
 
-.patient-actions button {
-    margin-left: 10px;
-    background-color: #8B4513;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.patient-actions button:hover {
-    background-color: #654321;
+.medical-records .record-item {
+    border: 1px solid #8B4513;
+    padding: 10px;
+    margin-bottom: 10px;
 }
