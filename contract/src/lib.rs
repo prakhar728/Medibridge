@@ -20,21 +20,21 @@ pub struct HealthContract {
     appointments: HashMap<u64, Appointment>,
 }
 
-#[derive(BorshDeserialize, BorshSerialize)]
+#[derive(Serialize,BorshDeserialize, BorshSerialize)]
 pub struct Patient {
     id: AccountId,
     name: String,
     medical_records: Vec<MedicalRecord>,
 }
 
-#[derive(BorshDeserialize, BorshSerialize)]
+#[derive(Serialize,BorshDeserialize, BorshSerialize)]
 pub struct Doctor {
     id: AccountId,
     name: String,
     base_consultation_fee: Balance,
 }
 
-#[derive(BorshDeserialize, BorshSerialize, Clone)]
+#[derive(Serialize,BorshDeserialize, BorshSerialize, Clone)]
 pub struct MedicalRecord {
     id: u64,
     patient_id: AccountId,

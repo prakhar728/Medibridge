@@ -8,7 +8,10 @@ const DoctorLayout = ({ isSignedIn, contractId, wallet }) => {
   const checkDoctorStatus = async () =>{
     console.log("Checking the Doctors status");
     try {
-      return wallet.viewMethod({ method: 'get_patient', args: { id: wallet.accountId },contractId })
+      // return await wallet.viewMethod({ method: 'get_patient', args: { id: wallet.accountId },contractId })
+      const messages = await wallet.viewMethod({ contractId: contractId, method: "get_patient", args: { id: wallet.accountId }});
+      console.log(messages);
+      return messages;
     } catch (error) {
       console.log(error);
     }
