@@ -1,39 +1,6 @@
-# Hello NEAR Contract
+# Health Contract
 
-The smart contract exposes two methods to enable storing and retrieving a greeting in the NEAR network.
-
-```rust
-const DEFAULT_GREETING: &str = "Hello";
-
-#[near_bindgen]
-#[derive(BorshDeserialize, BorshSerialize)]
-pub struct Contract {
-    greeting: String,
-}
-
-impl Default for Contract {
-    fn default() -> Self {
-        Self{greeting: DEFAULT_GREETING.to_string()}
-    }
-}
-
-#[near_bindgen]
-impl Contract {
-    // Public: Returns the stored greeting, defaulting to 'Hello'
-    pub fn get_greeting(&self) -> String {
-        return self.greeting.clone();
-    }
-
-    // Public: Takes a greeting, such as 'howdy', and records it
-    pub fn set_greeting(&mut self, greeting: String) {
-        // Record a log permanently to the blockchain!
-        log!("Saving greeting {}", greeting);
-        self.greeting = greeting;
-    }
-}
-```
-
-<br />
+The Health Contract is a smart contract designed to facilitate decentralized interactions between patients and doctors in the healthcare domain. It leverages the power of blockchain technology to ensure secure, transparent, and efficient connectivity while preserving patient privacy and control over medical data.
 
 # Quickstart
 
@@ -58,34 +25,48 @@ cat ./neardev/dev-account
 
 <br />
 
-## 2. Retrieve the Greeting
+## 2. Functions
 
-`get_greeting` is a read-only method (aka `view` method).
-
-`View` methods can be called for **free** by anyone, even people **without a NEAR account**!
-
-```bash
-# Use near-cli to get the greeting
-near view <dev-account> get_greeting
+```rust
+pub fn register_patient(&mut self, id: &AccountId, name: String)
 ```
 
-<br />
+This function allows the registration of a new patient with a specified ID and name. It ensures that the patient ID is unique and associates the patient with an empty list of medical records. The function is payable, meaning a fee is required to execute this operation.
 
-## 3. Store a New Greeting
-`set_greeting` changes the contract's state, for which it is a `change` method.
-
-`Change` methods can only be invoked using a NEAR account, since the account needs to pay GAS for the transaction.
-
-```bash
-# Use near-cli to set a new greeting
-near call <dev-account> set_greeting '{"message":"howdy"}' --accountId <dev-account>
+```rust 
+pub fn register_doctor(&mut self, id: &AccountId, name: String)
 ```
+This function enables the registration of a new doctor with a specified ID and name. It checks the uniqueness of the doctor's ID and adds the doctor to the contract's list of doctors. Like `register_patient`, this function is payable.
 
-**Tip:** If you would like to call `set_greeting` using your own account, first login into NEAR using:
-
-```bash
-# Use near-cli to login your NEAR account
-near login
+```rust
+pub fn store_medical_record(
+    &mut self,
+    id: u64,
+    patient_id: &AccountId,
+    record_data: String,
+    is_public: bool,
+)
 ```
+This function allows the storage of a medical record for a patient with a specified ID, record data, and privacy settings. It ensures the uniqueness of the medical record ID and associates the record with the patient. If the record is marked as public, it will be added to the contract's list of public records. Similar to the previous functions, this operation requires a fee to be paid.
 
-and then use the logged account to sign the transaction: `--accountId <your-account>`.
+```rust
+pub fn schedule_appointment(
+    &mut self,
+    id: u64,
+    patient_id: &AccountId,
+    doctor_id: &AccountId,
+    timestamp: u64,
+    location: String,
+)
+```
+This function enables the scheduling of an appointment between a patient and a doctor. It verifies the uniqueness of the appointment ID and stores the appointment details, including the patient ID, doctor ID, appointment timestamp, and location.
+
+```rust
+pub fn pay_doctor(&mut self, doctor_id: &AccountId, amount: Balance) -> Promise
+```
+This function facilitates the payment of a specified amount to a doctor. It verifies the existence of both the patient and the doctor, checks if the patient has enough balance for the payment, and transfers the specified amount from the patient to the doctor.
+
+```rust
+pub fn view_scheduled_appointments(&self) -> Vec<Appointment>
+```
+This function allows patients and doctors to view their scheduled appointments. It retrieves the caller's account ID and checks if the caller is either a patient or a doctor. If authenticated, the function fetches and returns the appointments associated with the caller.
