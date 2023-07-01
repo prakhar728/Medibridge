@@ -14,12 +14,22 @@ async fn main() -> anyhow::Result<()> {
 
     // create accounts
     let account = worker.dev_create_account().await?;
-    let patient = account
-        .create_subaccount( "alice")
+    let alice = account
+        .create_subaccount("alice")
         .initial_balance(parse_near!("30 N"))
         .transact()
         .await?
         .into_result()?;
+    let alice_id = alice.id();
+
+    let account_2 = worker.dev_create_account().await?;
+    let bob = account
+        .create_subaccount("Dr.BoB")
+        .initial_balance(parse_near!("30 N"))
+        .transact()
+        .await?
+        .into_result()?;
+    let bob_id = bob.id();
 
 
     // begin tests
