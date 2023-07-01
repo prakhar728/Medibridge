@@ -1,14 +1,15 @@
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::env::panic_str;
+use near_sdk::log;
+use near_sdk::require;
+use near_sdk::serde::Serialize;
 use near_sdk::AccountId;
 use near_sdk::Balance;
 use near_sdk::Promise;
-use near_sdk::serde::Serialize;
 use near_sdk::{env, near_bindgen};
 use std::collections::{HashMap, HashSet};
 use std::hash::BuildHasher;
-use near_sdk::require;
-use  near_sdk::log;
+
 #[near_bindgen]
 #[derive(Default, BorshDeserialize, BorshSerialize)]
 pub struct HealthContract {
@@ -30,6 +31,7 @@ pub struct Patient {
 pub struct Doctor {
     id: AccountId,
     name: String,
+    base_consultation_fee: Balance,
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
@@ -49,7 +51,7 @@ impl Default for MedicalRecord {
     }
 }
 
-#[derive(Clone,Serialize ,BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Serialize, BorshDeserialize, BorshSerialize)]
 pub struct Appointment {
     patient_id: AccountId,
     doctor_id: AccountId,
@@ -80,19 +82,23 @@ impl HealthContract {
 
     // Register a new doctor with the specified ID and name.
     #[payable]
-    pub fn register_doctor(&mut self, id: &AccountId, name: String) {
+    pub fn register_doctor(&mut self, id: &AccountId, name: String, fee: Balance) {
         self.transfer_fee();
         require!(
             !self.doctors.contains_key(id),
             "Doctor with the same ID already exists."
         );
-        
-        let doctor = Doctor {id:id.clone(), name };
+
+        let doctor = Doctor {
+            id: id.clone(),
+            name,
+            base_consultation_fee: fee,
+        };
         self.doctors.insert(id.clone(), doctor);
         log!("Registered doctor successfully. ID: {}", id);
     }
 
-    // Store a medical record for a patient with the specified ID, 
+    // Store a medical record for a patient with the specified ID,
     // record data, and privacy setting.
     #[payable]
     pub fn store_medical_record(
@@ -110,7 +116,7 @@ impl HealthContract {
 
         let medical_record = MedicalRecord {
             id,
-            patient_id:patient_id.clone(),
+            patient_id: patient_id.clone(),
             record_data,
         };
         self.medical_records.insert(id, medical_record);
@@ -141,8 +147,8 @@ impl HealthContract {
         );
 
         let appointment = Appointment {
-            patient_id:patient_id.clone(),
-            doctor_id:doctor_id.clone(),
+            patient_id: patient_id.clone(),
+            doctor_id: doctor_id.clone(),
             timestamp,
             location,
         };
@@ -154,8 +160,8 @@ impl HealthContract {
     #[payable]
     pub fn pay_doctor(&mut self, doctor_id: &AccountId, amount: Balance) -> Promise {
         self.transfer_fee();
-        let patient_id = env::predecessor_account_id();
 
+        let patient_id = env::predecessor_account_id();
         // Ensure the patient exists
         let _patient = match self.patients.get_mut(&patient_id) {
             Some(patient) => patient,
@@ -167,6 +173,10 @@ impl HealthContract {
             Some(doctor) => doctor,
             None => panic_str("Doctor does not exist."),
         };
+        require!(
+            amount >= doctor.base_consultation_fee,
+            "An appointment with the same ID already exists."
+        );
 
         // Ensure the patient has enough balance to make the payment
         let patient_balance = env::account_balance();
@@ -178,11 +188,11 @@ impl HealthContract {
         let doctor_account_id = doctor.id.clone();
         Promise::new(doctor_account_id.clone()).transfer(amount)
     }
-    
+
     // Function to view scheduled appointments for a patient or doctor, with necessary authentication.
     pub fn view_scheduled_appointments(&self) -> Vec<Appointment> {
         let account_id = env::predecessor_account_id();
-        log!("The Account id calling this is:{}",account_id);
+        log!("The Account id calling this is:{}", account_id);
         // Check if the caller is a patient or doctor
         if self.patients.contains_key(&account_id) || self.doctors.contains_key(&account_id) {
             // Fetch the appointments for the patient or doctor
@@ -197,7 +207,9 @@ impl HealthContract {
 
             return appointments;
         } else {
-            env::panic_str("Access denied. Only patients and doctors can view scheduled appointments.");
+            env::panic_str(
+                "Access denied. Only patients and doctors can view scheduled appointments.",
+            );
         }
     }
 
@@ -228,30 +240,49 @@ mod tests {
     #[test]
     fn register_patient_successfully() {
         let mut contract = HealthContract::default();
-        contract.register_patient(&AccountId::new_unchecked("kinosxz.near".to_string()), "John Doe".to_string());
-        let patient = contract.patients.get(&AccountId::new_unchecked("kinosxz.near".to_string())).unwrap();
+        contract.register_patient(
+            &AccountId::new_unchecked("kinosxz.near".to_string()),
+            "John Doe".to_string(),
+        );
+        let patient = contract
+            .patients
+            .get(&AccountId::new_unchecked("kinosxz.near".to_string()))
+            .unwrap();
         assert_eq!(patient.name, "John Doe".to_string());
     }
 
     #[test]
     fn register_doctor_successfully() {
         let mut contract = HealthContract::default();
-        contract.register_doctor(&AccountId::new_unchecked("elsayed.near".to_string()), "Dr. Tarek".to_string());
-        let doctor = contract.doctors.get(&AccountId::new_unchecked("elsayed.near".to_string())).unwrap();
+        contract.register_doctor(
+            &AccountId::new_unchecked("elsayed.near".to_string()),
+            "Dr. Tarek".to_string(),
+            3,
+        );
+        let doctor = contract
+            .doctors
+            .get(&AccountId::new_unchecked("elsayed.near".to_string()))
+            .unwrap();
         assert_eq!(doctor.name, "Dr. Tarek".to_string());
     }
 
     #[test]
     fn store_medical_record_successfully() {
         let mut contract = HealthContract::default();
-        contract.register_patient(&AccountId::new_unchecked("kinosxz.near".to_string()), "John Doe".to_string());
+        contract.register_patient(
+            &AccountId::new_unchecked("kinosxz.near".to_string()),
+            "John Doe".to_string(),
+        );
         contract.store_medical_record(
             1,
             &AccountId::new_unchecked("kinosxz.near".to_string()),
             "Some record data".to_string(),
             true,
         );
-        let patient = contract.patients.get(&AccountId::new_unchecked("kinosxz.near".to_string())).unwrap();
+        let patient = contract
+            .patients
+            .get(&AccountId::new_unchecked("kinosxz.near".to_string()))
+            .unwrap();
         assert_eq!(patient.medical_records.len(), 1);
         assert_eq!(contract.medical_records.len(), 1);
     }
@@ -259,8 +290,15 @@ mod tests {
     #[test]
     fn schedule_appointment_successfully() {
         let mut contract = HealthContract::default();
-        contract.register_patient(&AccountId::new_unchecked("kinosxz.near".to_string()), "John Doe".to_string());
-        contract.register_doctor(&AccountId::new_unchecked("elsayed.near".to_string()), "Dr. Smith".to_string());
+        contract.register_patient(
+            &AccountId::new_unchecked("kinosxz.near".to_string()),
+            "John Doe".to_string(),
+        );
+        contract.register_doctor(
+            &AccountId::new_unchecked("elsayed.near".to_string()),
+            "Dr. Smith".to_string(),
+            3,
+        );
 
         contract.schedule_appointment(
             1,
@@ -284,10 +322,22 @@ mod tests {
         let location = "Hospital".to_string();
 
         contract.register_patient(&patient_id, "John Doe".to_string());
-        contract.register_doctor(&doctor_id, "Dr. Smith".to_string());
+        contract.register_doctor(&doctor_id, "Dr. Smith".to_string(), 3);
         contract.schedule_appointment(1, &patient_id, &doctor_id, timestamp, location.clone());
-        contract.schedule_appointment(2, &patient_id, &doctor_id, timestamp + 86400, location.clone());
-        contract.schedule_appointment(3, &patient_id, &doctor_id, timestamp + 172800, location.clone());
+        contract.schedule_appointment(
+            2,
+            &patient_id,
+            &doctor_id,
+            timestamp + 86400,
+            location.clone(),
+        );
+        contract.schedule_appointment(
+            3,
+            &patient_id,
+            &doctor_id,
+            timestamp + 172800,
+            location.clone(),
+        );
 
         let appointments = contract.view_scheduled_appointments();
         assert_eq!(appointments.len(), 3);
@@ -295,5 +345,4 @@ mod tests {
         assert_eq!(appointments[1].location, location);
         assert_eq!(appointments[2].location, location);
     }
-
 }
