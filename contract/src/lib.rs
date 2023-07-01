@@ -20,25 +20,33 @@ pub struct HealthContract {
     appointments: HashMap<u64, Appointment>,
 }
 
-#[derive(Serialize,BorshDeserialize, BorshSerialize)]
+#[derive(Serialize, BorshDeserialize, BorshSerialize)]
 pub struct Patient {
     id: AccountId,
     name: String,
     medical_records: Vec<MedicalRecord>,
 }
 
-#[derive(Serialize,BorshDeserialize, BorshSerialize)]
+#[derive(Serialize, BorshDeserialize, BorshSerialize)]
 pub struct Doctor {
     id: AccountId,
     name: String,
     base_consultation_fee: Balance,
 }
 
-#[derive(Serialize,BorshDeserialize, BorshSerialize, Clone)]
+#[derive(Serialize, BorshDeserialize, BorshSerialize, Clone)]
 pub struct MedicalRecord {
     id: u64,
     patient_id: AccountId,
     record_data: String,
+}
+
+impl BuildHasher for MedicalRecord {
+    type Hasher = std::collections::hash_map::DefaultHasher;
+
+    fn build_hasher(&self) -> Self::Hasher {
+        std::collections::hash_map::DefaultHasher::new()
+    }
 }
 
 impl Default for MedicalRecord {
@@ -97,7 +105,7 @@ impl HealthContract {
         // Check if the caller is a patient
         if self.patients.contains_key(&account_id) {
             let patient = self.patients.get(&account_id).unwrap();
-            return patient.medical_records.clone();
+            patient.medical_records.clone()
         } else {
             env::panic_str("Access denied. Only patients can view their medical records.");
         }
@@ -171,7 +179,7 @@ impl HealthContract {
         };
         self.medical_records.insert(id, medical_record.clone());
 
-        if let Some(patient) = self.patients.get_mut(&patient_id) {
+        if let Some(patient) = self.patients.get_mut(patient_id) {
             patient.medical_records.push(medical_record);
             if is_public {
                 self.public_records.insert(id);
@@ -219,7 +227,7 @@ impl HealthContract {
         };
 
         // Ensure the doctor exists
-        let doctor = match self.doctors.get(&doctor_id) {
+        let doctor = match self.doctors.get(doctor_id) {
             Some(doctor) => doctor,
             None => panic_str("Doctor does not exist."),
         };
@@ -236,7 +244,7 @@ impl HealthContract {
 
         // Transfer the payment from patient to doctor
         let doctor_account_id = doctor.id.clone();
-        Promise::new(doctor_account_id.clone()).transfer(amount)
+        Promise::new(doctor_account_id).transfer(amount)
     }
 
     // Function to view scheduled appointments for a patient or doctor, with necessary authentication.
@@ -255,7 +263,7 @@ impl HealthContract {
                 .cloned()
                 .collect();
 
-            return appointments;
+            appointments
         } else {
             env::panic_str(
                 "Access denied. Only patients and doctors can view scheduled appointments.",
@@ -271,15 +279,7 @@ impl HealthContract {
         let contract_owner = env::predecessor_account_id();
 
         // Transfer the fee from the caller to the contract owner and return the Promise
-        Promise::new(contract_owner.clone()).transfer(fee_amount)
-    }
-}
-
-impl BuildHasher for MedicalRecord {
-    type Hasher = std::collections::hash_map::DefaultHasher;
-
-    fn build_hasher(&self) -> Self::Hasher {
-        std::collections::hash_map::DefaultHasher::new()
+        Promise::new(contract_owner).transfer(fee_amount)
     }
 }
 
