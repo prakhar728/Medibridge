@@ -89,22 +89,24 @@ impl HealthContract {
         }
     }
 
-    // Get a patient's medical records by account ID.
-    pub fn get_patient_records(&self, id: &AccountId) -> Vec<MedicalRecord> {
-        require!(
-            self.patients.contains_key(id),
-            "Patient with the specified ID does not exist."
-        );
+    // Get the scheduled appointments for the calling patient.
+    pub fn get_patient_appointments(&self) -> Vec<Appointment> {
+        let account_id = env::predecessor_account_id();
+        log!("The Account id calling this is: {}", account_id);
 
-        let patient = self.patients.get(id).unwrap();
-        let records: Vec<MedicalRecord> = patient
-            .medical_records
-            .iter()
-            .filter_map(|record_id| self.medical_records.get(record_id))
-            .cloned()
-            .collect();
+        // Check if the caller is a patient
+        if self.patients.contains_key(&account_id) {
+            let appointments = self
+                .appointments
+                .values()
+                .filter(|appointment| appointment.patient_id == account_id)
+                .cloned()
+                .collect();
 
-        records
+            return appointments;
+        } else {
+            env::panic_str("Access denied. Only patients can view their scheduled appointments.");
+        }
     }
 
     // Register a new patient with the specified ID and name.
@@ -310,6 +312,40 @@ mod tests {
             .get(&AccountId::new_unchecked("elsayed.near".to_string()))
             .unwrap();
         assert_eq!(doctor.name, "Dr. Tarek".to_string());
+    }
+
+    #[test]
+    fn test_get_patient_appointments() {
+        let mut contract = HealthContract::default();
+        let patient_id = AccountId::new_unchecked("bob.near".to_string());
+        let doctor_id = AccountId::new_unchecked("doctor.near".to_string());
+
+        let timestamp = 1625097600; // July 1, 2021, 00:00:00 UTC
+        let location = "Hospital".to_string();
+
+        contract.register_patient(&patient_id, "Alice".to_string());
+        contract.register_doctor(&doctor_id, "Dr. Smith".to_string(), 3);
+        contract.schedule_appointment(1, &patient_id, &doctor_id, timestamp, location.clone());
+        contract.schedule_appointment(
+            2,
+            &patient_id,
+            &doctor_id,
+            timestamp + 86400,
+            location.clone(),
+        );
+        contract.schedule_appointment(
+            3,
+            &patient_id,
+            &doctor_id,
+            timestamp + 172800,
+            location.clone(),
+        );
+
+        let appointments = contract.get_patient_appointments();
+        assert_eq!(appointments.len(), 3);
+        assert_eq!(appointments[0].location, location);
+        assert_eq!(appointments[1].location, location);
+        assert_eq!(appointments[2].location, location);
     }
 
     #[test]
