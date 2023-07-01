@@ -4,6 +4,7 @@ import services1 from "../assets/services1.png";
 import services2 from "../assets/services2.png";
 import services3 from "../assets/services2.png";
 import logo from "../assets/MediBridge_logo.png";
+import { Link } from "react-router-dom";
 const LandingPage = () => {
   const showFeatureServices = (event) => {
     const service = event.target.closest(".service");
@@ -19,26 +20,26 @@ const LandingPage = () => {
       <nav className="fade-in">
         <ul className="navigation-bar">
           <li>
-            <a href="index.html">Home</a>
+            <Link to="index.html">Home</Link>
           </li>
           <li>
-            <a href="about.html">About</a>
+            <Link to="about.html">About</Link>
           </li>
           <li>
-            <a href="contact.html">Contact</a>
+            <Link to="contact.html">Contact</Link>
           </li>
         </ul>
       </nav>
       <div className="logo">
-        <a href="index.html">
+        <Link to="index.html">
           <img src={logo} alt="MedBridge Logo" />
-        </a>
+        </Link>
       </div>
       <div className="user-authentication fade-in">
         {/* <!-- Show login or account-related links here --> */}
         <div className="login-signup">
-          <a href="doctor.html">Login as a Doctor</a>
-          <a href="patient.html">Login as a Patient</a>
+          <Link to={'doctor/dashboard'}>Login as Link Doctor</Link>
+          <Link to="patient.html">Login as Link Patient</Link>
         </div>
         {/* <!-- Display user name or profile picture here after authentication --> */}
         {/* <!-- User dropdown menu for account settings and logout --> */}
@@ -82,7 +83,7 @@ const LandingPage = () => {
               <div className="service-text">
                 <h3>Appointment Scheduling</h3>
                 <p>
-                  Book and manage appointments with healthcare providers in a
+                  Book and manage appointments with healthcare providers in Link
                   convenient and hassle-free way.
                 </p>
               </div>
@@ -93,16 +94,16 @@ const LandingPage = () => {
       <footer className="fade-in">
         <ul className="footer-links">
           <li>
-            <a href="terms.html">Terms of Service</a>
+            <Link to="terms.html">Terms of Service</Link>
           </li>
           <li>
-            <a href="privacy.html">Privacy Policy</a>
+            <Link to="privacy.html">Privacy Policy</Link>
           </li>
           <li>
-            <a href="about.html">About Us</a>
+            <Link to="about.html">About Us</Link>
           </li>
           <li>
-            <a href="contact.html">Contact Us</a>
+            <Link to="contact.html">Contact Us</Link>
           </li>
         </ul>
       </footer>

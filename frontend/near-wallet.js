@@ -103,4 +103,14 @@ export class Wallet {
     const transaction = await provider.txStatus(txhash, 'unnused');
     return providers.getTransactionLastResult(transaction);
   }
+
+  async getAccountId(){
+    try {
+      console.log(this.accountId);
+    return this.accountId;
+      
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }
