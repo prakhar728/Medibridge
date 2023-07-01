@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import {
   createBrowserRouter,
+  createHashRouter,
   RouterProvider,
 } from "react-router-dom";
 import { createRoot } from 'react-dom/client';
@@ -11,7 +12,7 @@ import { createRoot } from 'react-dom/client';
 import { Wallet } from './near-wallet';
 import LandingPage from './pages/LandingPage';
 
-const CONTRACT_ADDRESS = process.env.CONTRACT_NAME
+const CONTRACT_ADDRESS = process.env.CONTRACT_NAME;
 
 
 // When creating the wallet you can optionally ask to create an access key
@@ -25,7 +26,7 @@ const root = createRoot(container);
 window.onload = async () => {
   const isSignedIn = await wallet.startUp();
 
-  const router = createBrowserRouter([
+  const router = createHashRouter([
     {
       path: "/",
       element: <LandingPage />,
