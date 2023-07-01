@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MedBridge - Your Pathway to Connected Care</title>
+  <link rel="stylesheet" href="styles.css"> <!-- Include your custom stylesheet here -->
+  <style>
+    .fade-in {
+      animation: fade-in 1s ease-in-out;
+    }
+    @keyframes fade-in {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="fade-in">
+    <ul class="navigation-bar">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+  <div class="logo">
+    <a href="index.html"><img src="assets/MediBridge_logo.png" alt="MedBridge Logo"></a>
+  </div>
+  <div class="user-authentication fade-in">
+    <!-- Show login or account-related links here -->
+    <div class="login-signup">
+      <a href="doctor.html">Login as a Doctor</a>
+      <a href="patient.html">Login as a Patient</a>
+    </div>
+    <!-- Display user name or profile picture here after authentication -->
+    <!-- User dropdown menu for account settings and logout -->
+  </div>
+
+  <main class="fade-in">
+    <!-- Hero section -->
+    <section class="hero">
+      <h1>Welcome to MedBridge - The Future of Decentralized Care</h1>
+      <!-- Add more content and features as needed -->
+    </section>
+    <!-- Featured services or benefits section -->
+    <section class="featured-services">
+      <h2>Featured Services</h2>
+      <div class="service">
+        <div class="service-content">
+          <img src="assets/services1.png" alt="Service 1">
+          <div class="service-text">
+            <h3>Secure Payment</h3>
+            <p>Secure payment from patients to doctors based on the service provided.</p>
+          </div>
+        </div>
+      </div>
+      <div class="service">
+        <div class="service-content">
+          <div class="service-text">
+            <h3>Electronic Health Records</h3>
+            <p>Access and manage your health records securely online, anytime, anywhere.</p>
+          </div>
+          <img src="assets/services2.png" alt="Service 2">
+        </div>
+      </div>
+      <div class="service">
+        <div class="service-content">
+          <img src="assets/service3.jpg" alt="Service 3">
+          <div class="service-text">
+            <h3>Appointment Scheduling</h3>
+            <p>Book and manage appointments with healthcare providers in a convenient and hassle-free way.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="fade-in">
+    <ul class="footer-links">
+      <li><a href="terms.html">Terms of Service</a></li>
+      <li><a href="privacy.html">Privacy Policy</a></li>
+      <li><a href="about.html">About Us</a></li>
+      <li><a href="contact.html">Contact Us</a></li>
+    </ul>
+  </footer>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const featuredServices = document.querySelector('.featured-services');
+
+      featuredServices.addEventListener('click', function (event) {
+        const service = event.target.closest('.service');
+        if (service) {
+          const serviceContent = service.querySelector('.service-content');
+          if (serviceContent) {
+            serviceContent.classList.toggle('show');
+          }
+        }
+      });
+    });
+
+  </script>
+</body>
+</html>
