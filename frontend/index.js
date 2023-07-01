@@ -15,7 +15,7 @@ import DoctorLayout from './pages/DoctorDashboard/DoctorLayout';
 import DoctorDashboard from './pages/DoctorDashboard/DoctorDashboard';
 import PatientRecord from './pages/DoctorDashboard/PatientRecord';
 
-const CONTRACT_ADDRESS = process.env.CONTRACT_NAME || "kinosxz.testnet";
+const CONTRACT_ADDRESS = 'test1.testingm.testnet' ;
 console.log(CONTRACT_ADDRESS);
 
 // When creating the wallet you can optionally ask to create an access key

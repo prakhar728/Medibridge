@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
 import { SignInPrompt, SignOutButton } from "../../ui-components";
-
+import DoctorOnboarding from "./DoctorOnboarding";
 const DoctorLayout = ({ isSignedIn, contractId, wallet }) => {
   console.log(isSignedIn);
   const [isADoctor, setisADoctor] = useState(false);
@@ -10,10 +10,12 @@ const DoctorLayout = ({ isSignedIn, contractId, wallet }) => {
     try {
       // return await wallet.viewMethod({ method: 'get_patient', args: { id: wallet.accountId },contractId })
       const messages = await wallet.viewMethod({ contractId: contractId, method: "get_patient", args: { id: wallet.accountId }});
-      console.log(messages);
+      console.log(JSON.parse(messages) );
+      setisADoctor(true);
       return messages;
     } catch (error) {
       console.log(error);
+      setisADoctor(false);
     }
     
   }
@@ -21,7 +23,7 @@ const DoctorLayout = ({ isSignedIn, contractId, wallet }) => {
     if(isSignedIn)
     checkDoctorStatus();
   }, [])
-  
+
   return (
     <div>
       <nav className="fade-in">
@@ -38,8 +40,9 @@ const DoctorLayout = ({ isSignedIn, contractId, wallet }) => {
         </ul>
       </nav>
  
-      {!isSignedIn ?<SignInPrompt  onClick={() => wallet.signIn()}/> :
-      <Outlet />
+      {!isSignedIn ?  <SignInPrompt  onClick={() => wallet.signIn()}/> :
+      isADoctor?<Outlet />: <DoctorOnboarding />
+      
     }
       <footer className="fade-in">
         <ul className="footer-links">
