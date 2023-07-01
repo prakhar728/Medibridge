@@ -1,0 +1,37 @@
+
+/* Patient card styles */
+.patient-card {
+    background-color: #f8f8f8;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+
+.patient-info {
+    margin-bottom: 10px;
+}
+
+.patient-info h3 {
+    font-size: 18px;
+    margin: 0;
+}
+
+.patient-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.patient-actions button {
+    margin-left: 10px;
+    background-color: #8B4513;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.patient-actions button:hover {
+    background-color: #654321;
+}
