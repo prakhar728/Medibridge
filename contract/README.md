@@ -26,6 +26,20 @@ cat ./neardev/dev-account
 <br />
 
 ## 2. Functions
+```rust
+pub fn get_patient(&self, id: &AccountId) -> Result<&Patient, &str>
+```
+This function returns the patient's information given his account ID.
+
+```rust
+pub fn get_doctor(&self, id: &AccountId) -> Result<&Patient, &str>
+```
+This function returns the doctor's information given his account ID.
+
+```rust 
+pub fn get_patient_records(&self, id: &AccountId) -> Vec<MedicalRecord> 
+```
+This function returns a patient's medical records given his account ID.
 
 ```rust
 pub fn register_patient(&mut self, id: &AccountId, name: String)

@@ -34,7 +34,7 @@ pub struct Doctor {
     base_consultation_fee: Balance,
 }
 
-#[derive(BorshDeserialize, BorshSerialize)]
+#[derive(BorshDeserialize, BorshSerialize, Clone)]
 pub struct MedicalRecord {
     id: u64,
     patient_id: AccountId,
@@ -61,6 +61,52 @@ pub struct Appointment {
 
 #[near_bindgen]
 impl HealthContract {
+    // Get patient information by account ID.
+    #[handle_result]
+    pub fn get_patient(&self, id: &AccountId) -> Result<&Patient, &str> {
+        require!(
+            self.patients.contains_key(id),
+            "Patient with the specified ID does not exist."
+        );
+
+        match self.patients.get(id) {
+            Some(patient) => Ok(patient),
+            None => Err("Failed to retrieve patient information."),
+        }
+    }
+
+    // Get doctor information by account ID.
+    #[handle_result]
+    pub fn get_doctor(&self, id: &AccountId) -> Result<&Doctor, &str> {
+        require!(
+            self.doctors.contains_key(id),
+            "Doctor with the specified ID does not exist."
+        );
+
+        match self.doctors.get(id) {
+            Some(doctor) => Ok(doctor),
+            None => Err("Failed to retrieve doctor information."),
+        }
+    }
+
+    // Get a patient's medical records by account ID.
+    pub fn get_patient_records(&self, id: &AccountId) -> Vec<MedicalRecord> {
+        require!(
+            self.patients.contains_key(id),
+            "Patient with the specified ID does not exist."
+        );
+
+        let patient = self.patients.get(id).unwrap();
+        let records: Vec<MedicalRecord> = patient
+            .medical_records
+            .iter()
+            .filter_map(|record_id| self.medical_records.get(record_id))
+            .cloned()
+            .collect();
+
+        records
+    }
+
     // Register a new patient with the specified ID and name.
     #[payable]
     pub fn register_patient(&mut self, id: &AccountId, name: String) {
