@@ -3,6 +3,10 @@ MediBridge
 
 The goal of MediBridge is to develop a decentralized system that facilitates the connection between patients and doctors in the healthcare domain. By leveraging blockchain technology, the project aims to create a secure, transparent, and efficient platform where patients can easily find and connect with doctors while maintaining control over their medical data.
 
+Background
+===========
+This project was developed for the Web3 BUILD Hackathon hosted in partnership with NEAR Horizon. It showcases the potential of blockchain technology in the healthcare industry. The goal of this project is to demonstrate how decentralized systems can securely store and share medical records, enabling patients to have greater control over their health information. Please note that this project is a demonstration for the hackathon and may require further refinement for production and real-world implementation.
+
 Quick Start
 ===========
 

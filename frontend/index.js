@@ -11,9 +11,12 @@ import { createRoot } from 'react-dom/client';
 // NEAR
 import { Wallet } from './near-wallet';
 import LandingPage from './pages/LandingPage';
+import DoctorLayout from './pages/DoctorDashboard/DoctorLayout';
+import DoctorDashboard from './pages/DoctorDashboard/DoctorDashboard';
+import PatientRecord from './pages/DoctorDashboard/PatientRecord';
 
-const CONTRACT_ADDRESS = process.env.CONTRACT_NAME;
-
+const CONTRACT_ADDRESS = 'test1.testingm.testnet' ;
+console.log(CONTRACT_ADDRESS);
 
 // When creating the wallet you can optionally ask to create an access key
 // Having the key enables to call non-payable methods without interrupting the user to sign
@@ -30,6 +33,20 @@ window.onload = async () => {
     {
       path: "/",
       element: <LandingPage />,
+    },
+    {
+      path: "/doctor",
+      element: <DoctorLayout isSignedIn={isSignedIn} contractId={CONTRACT_ADDRESS} wallet={wallet}/>,
+      children:[
+        {
+          path: "dashboard",
+          element: <DoctorDashboard />,
+        },
+        {
+          path: "patientrecord/:patientid",
+          element: <PatientRecord />,
+        },
+      ]
     },
     {
       path: "/app",

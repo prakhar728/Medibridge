@@ -1,14 +1,15 @@
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::env::panic_str;
+use near_sdk::log;
+use near_sdk::require;
+use near_sdk::serde::Serialize;
 use near_sdk::AccountId;
 use near_sdk::Balance;
 use near_sdk::Promise;
-use near_sdk::serde::Serialize;
 use near_sdk::{env, near_bindgen};
 use std::collections::{HashMap, HashSet};
 use std::hash::BuildHasher;
-use near_sdk::require;
-use  near_sdk::log;
+
 #[near_bindgen]
 #[derive(Default, BorshDeserialize, BorshSerialize)]
 pub struct HealthContract {
@@ -19,24 +20,33 @@ pub struct HealthContract {
     appointments: HashMap<u64, Appointment>,
 }
 
-#[derive(BorshDeserialize, BorshSerialize)]
+#[derive(Serialize, BorshDeserialize, BorshSerialize)]
 pub struct Patient {
     id: AccountId,
     name: String,
-    medical_records: Vec<u64>,
+    medical_records: Vec<MedicalRecord>,
 }
 
-#[derive(BorshDeserialize, BorshSerialize)]
+#[derive(Serialize, BorshDeserialize, BorshSerialize)]
 pub struct Doctor {
     id: AccountId,
     name: String,
+    base_consultation_fee: Balance,
 }
 
-#[derive(BorshDeserialize, BorshSerialize)]
+#[derive(Serialize, BorshDeserialize, BorshSerialize, Clone)]
 pub struct MedicalRecord {
     id: u64,
     patient_id: AccountId,
     record_data: String,
+}
+
+impl BuildHasher for MedicalRecord {
+    type Hasher = std::collections::hash_map::DefaultHasher;
+
+    fn build_hasher(&self) -> Self::Hasher {
+        std::collections::hash_map::DefaultHasher::new()
+    }
 }
 
 impl Default for MedicalRecord {
@@ -49,7 +59,7 @@ impl Default for MedicalRecord {
     }
 }
 
-#[derive(Clone,Serialize ,BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Serialize, BorshDeserialize, BorshSerialize)]
 pub struct Appointment {
     patient_id: AccountId,
     doctor_id: AccountId,
@@ -59,6 +69,48 @@ pub struct Appointment {
 
 #[near_bindgen]
 impl HealthContract {
+    // Get patient information by account ID.
+    #[handle_result]
+    pub fn get_patient(&self, id: &AccountId) -> Result<&Patient, &str> {
+        require!(
+            self.patients.contains_key(id),
+            "Patient with the specified ID does not exist."
+        );
+
+        match self.patients.get(id) {
+            Some(patient) => Ok(patient),
+            None => Err("Failed to retrieve patient information."),
+        }
+    }
+
+    // Get doctor information by account ID.
+    #[handle_result]
+    pub fn get_doctor(&self, id: &AccountId) -> Result<&Doctor, &str> {
+        require!(
+            self.doctors.contains_key(id),
+            "Doctor with the specified ID does not exist."
+        );
+
+        match self.doctors.get(id) {
+            Some(doctor) => Ok(doctor),
+            None => Err("Failed to retrieve doctor information."),
+        }
+    }
+
+    // Get the medical records for the calling patient.
+    pub fn get_patient_records(&self) -> Vec<MedicalRecord> {
+        let account_id = env::predecessor_account_id();
+        log!("The Account id calling this is: {}", account_id);
+
+        // Check if the caller is a patient
+        if self.patients.contains_key(&account_id) {
+            let patient = self.patients.get(&account_id).unwrap();
+            patient.medical_records.clone()
+        } else {
+            env::panic_str("Access denied. Only patients can view their medical records.");
+        }
+    }
+
     // Register a new patient with the specified ID and name.
     #[payable]
     pub fn register_patient(&mut self, id: &AccountId, name: String) {
@@ -80,19 +132,31 @@ impl HealthContract {
 
     // Register a new doctor with the specified ID and name.
     #[payable]
-    pub fn register_doctor(&mut self, id: &AccountId, name: String) {
+    pub fn register_doctor(&mut self, id: &AccountId, name: String, fee: Balance) {
         self.transfer_fee();
         require!(
             !self.doctors.contains_key(id),
             "Doctor with the same ID already exists."
         );
-        
-        let doctor = Doctor {id:id.clone(), name };
+
+        let doctor = Doctor {
+            id: id.clone(),
+            name,
+            base_consultation_fee: fee,
+        };
         self.doctors.insert(id.clone(), doctor);
         log!("Registered doctor successfully. ID: {}", id);
     }
 
-    // Store a medical record for a patient with the specified ID, 
+    // Get all public medical records stored on the chain.
+    pub fn get_public_medical_records(&self) -> Vec<MedicalRecord> {
+        self.public_records
+            .iter()
+            .map(|record_id| self.medical_records.get(record_id).unwrap().clone())
+            .collect()
+    }
+
+    // Store a medical record for a patient with the specified ID,
     // record data, and privacy setting.
     #[payable]
     pub fn store_medical_record(
@@ -105,18 +169,18 @@ impl HealthContract {
         self.transfer_fee();
         require!(
             !self.medical_records.contains_key(&id),
-            "Medical records with the same ID already exists."
+            "Medical records with the same ID already exist."
         );
 
         let medical_record = MedicalRecord {
             id,
-            patient_id:patient_id.clone(),
+            patient_id: patient_id.clone(),
             record_data,
         };
-        self.medical_records.insert(id, medical_record);
+        self.medical_records.insert(id, medical_record.clone());
 
-        if let Some(patient) = self.patients.get_mut(&patient_id) {
-            patient.medical_records.push(id);
+        if let Some(patient) = self.patients.get_mut(patient_id) {
+            patient.medical_records.push(medical_record);
             if is_public {
                 self.public_records.insert(id);
             }
@@ -141,8 +205,8 @@ impl HealthContract {
         );
 
         let appointment = Appointment {
-            patient_id:patient_id.clone(),
-            doctor_id:doctor_id.clone(),
+            patient_id: patient_id.clone(),
+            doctor_id: doctor_id.clone(),
             timestamp,
             location,
         };
@@ -154,8 +218,8 @@ impl HealthContract {
     #[payable]
     pub fn pay_doctor(&mut self, doctor_id: &AccountId, amount: Balance) -> Promise {
         self.transfer_fee();
-        let patient_id = env::predecessor_account_id();
 
+        let patient_id = env::predecessor_account_id();
         // Ensure the patient exists
         let _patient = match self.patients.get_mut(&patient_id) {
             Some(patient) => patient,
@@ -163,10 +227,14 @@ impl HealthContract {
         };
 
         // Ensure the doctor exists
-        let doctor = match self.doctors.get(&doctor_id) {
+        let doctor = match self.doctors.get(doctor_id) {
             Some(doctor) => doctor,
             None => panic_str("Doctor does not exist."),
         };
+        require!(
+            amount >= doctor.base_consultation_fee,
+            "An appointment with the same ID already exists."
+        );
 
         // Ensure the patient has enough balance to make the payment
         let patient_balance = env::account_balance();
@@ -176,13 +244,13 @@ impl HealthContract {
 
         // Transfer the payment from patient to doctor
         let doctor_account_id = doctor.id.clone();
-        Promise::new(doctor_account_id.clone()).transfer(amount)
+        Promise::new(doctor_account_id).transfer(amount)
     }
-    
+
     // Function to view scheduled appointments for a patient or doctor, with necessary authentication.
     pub fn view_scheduled_appointments(&self) -> Vec<Appointment> {
         let account_id = env::predecessor_account_id();
-        log!("The Account id calling this is:{}",account_id);
+        log!("The Account id calling this is:{}", account_id);
         // Check if the caller is a patient or doctor
         if self.patients.contains_key(&account_id) || self.doctors.contains_key(&account_id) {
             // Fetch the appointments for the patient or doctor
@@ -195,9 +263,11 @@ impl HealthContract {
                 .cloned()
                 .collect();
 
-            return appointments;
+            appointments
         } else {
-            env::panic_str("Access denied. Only patients and doctors can view scheduled appointments.");
+            env::panic_str(
+                "Access denied. Only patients and doctors can view scheduled appointments.",
+            );
         }
     }
 
@@ -209,15 +279,7 @@ impl HealthContract {
         let contract_owner = env::predecessor_account_id();
 
         // Transfer the fee from the caller to the contract owner and return the Promise
-        Promise::new(contract_owner.clone()).transfer(fee_amount)
-    }
-}
-
-impl BuildHasher for MedicalRecord {
-    type Hasher = std::collections::hash_map::DefaultHasher;
-
-    fn build_hasher(&self) -> Self::Hasher {
-        std::collections::hash_map::DefaultHasher::new()
+        Promise::new(contract_owner).transfer(fee_amount)
     }
 }
 
@@ -228,30 +290,68 @@ mod tests {
     #[test]
     fn register_patient_successfully() {
         let mut contract = HealthContract::default();
-        contract.register_patient(&AccountId::new_unchecked("kinosxz.near".to_string()), "John Doe".to_string());
-        let patient = contract.patients.get(&AccountId::new_unchecked("kinosxz.near".to_string())).unwrap();
+        contract.register_patient(
+            &AccountId::new_unchecked("kinosxz.near".to_string()),
+            "John Doe".to_string(),
+        );
+        let patient = contract
+            .patients
+            .get(&AccountId::new_unchecked("kinosxz.near".to_string()))
+            .unwrap();
         assert_eq!(patient.name, "John Doe".to_string());
     }
 
     #[test]
     fn register_doctor_successfully() {
         let mut contract = HealthContract::default();
-        contract.register_doctor(&AccountId::new_unchecked("elsayed.near".to_string()), "Dr. Tarek".to_string());
-        let doctor = contract.doctors.get(&AccountId::new_unchecked("elsayed.near".to_string())).unwrap();
+        contract.register_doctor(
+            &AccountId::new_unchecked("elsayed.near".to_string()),
+            "Dr. Tarek".to_string(),
+            3,
+        );
+        let doctor = contract
+            .doctors
+            .get(&AccountId::new_unchecked("elsayed.near".to_string()))
+            .unwrap();
         assert_eq!(doctor.name, "Dr. Tarek".to_string());
+    }
+
+    #[test]
+    fn get_patient_records_test() {
+        let mut contract = HealthContract::default();
+        let patient_id = AccountId::new_unchecked("bob.near".to_string());
+        let record_id = 1;
+        let record_data = "Medical record data".to_string();
+        let is_public = true;
+
+        contract.register_patient(&patient_id, "Alice".to_string());
+        contract.store_medical_record(record_id, &patient_id, record_data.clone(), is_public);
+
+        let records = contract.get_patient_records();
+
+        assert_eq!(records.len(), 1);
+        assert_eq!(records[0].id, record_id);
+        assert_eq!(records[0].patient_id, patient_id);
+        assert_eq!(records[0].record_data, record_data);
     }
 
     #[test]
     fn store_medical_record_successfully() {
         let mut contract = HealthContract::default();
-        contract.register_patient(&AccountId::new_unchecked("kinosxz.near".to_string()), "John Doe".to_string());
+        contract.register_patient(
+            &AccountId::new_unchecked("kinosxz.near".to_string()),
+            "John Doe".to_string(),
+        );
         contract.store_medical_record(
             1,
             &AccountId::new_unchecked("kinosxz.near".to_string()),
             "Some record data".to_string(),
             true,
         );
-        let patient = contract.patients.get(&AccountId::new_unchecked("kinosxz.near".to_string())).unwrap();
+        let patient = contract
+            .patients
+            .get(&AccountId::new_unchecked("kinosxz.near".to_string()))
+            .unwrap();
         assert_eq!(patient.medical_records.len(), 1);
         assert_eq!(contract.medical_records.len(), 1);
     }
@@ -259,8 +359,15 @@ mod tests {
     #[test]
     fn schedule_appointment_successfully() {
         let mut contract = HealthContract::default();
-        contract.register_patient(&AccountId::new_unchecked("kinosxz.near".to_string()), "John Doe".to_string());
-        contract.register_doctor(&AccountId::new_unchecked("elsayed.near".to_string()), "Dr. Smith".to_string());
+        contract.register_patient(
+            &AccountId::new_unchecked("kinosxz.near".to_string()),
+            "John Doe".to_string(),
+        );
+        contract.register_doctor(
+            &AccountId::new_unchecked("elsayed.near".to_string()),
+            "Dr. Smith".to_string(),
+            3,
+        );
 
         contract.schedule_appointment(
             1,
@@ -284,10 +391,22 @@ mod tests {
         let location = "Hospital".to_string();
 
         contract.register_patient(&patient_id, "John Doe".to_string());
-        contract.register_doctor(&doctor_id, "Dr. Smith".to_string());
+        contract.register_doctor(&doctor_id, "Dr. Smith".to_string(), 3);
         contract.schedule_appointment(1, &patient_id, &doctor_id, timestamp, location.clone());
-        contract.schedule_appointment(2, &patient_id, &doctor_id, timestamp + 86400, location.clone());
-        contract.schedule_appointment(3, &patient_id, &doctor_id, timestamp + 172800, location.clone());
+        contract.schedule_appointment(
+            2,
+            &patient_id,
+            &doctor_id,
+            timestamp + 86400,
+            location.clone(),
+        );
+        contract.schedule_appointment(
+            3,
+            &patient_id,
+            &doctor_id,
+            timestamp + 172800,
+            location.clone(),
+        );
 
         let appointments = contract.view_scheduled_appointments();
         assert_eq!(appointments.len(), 3);
@@ -295,5 +414,4 @@ mod tests {
         assert_eq!(appointments[1].location, location);
         assert_eq!(appointments[2].location, location);
     }
-
 }
