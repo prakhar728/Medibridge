@@ -2,16 +2,18 @@ import React, { useEffect, useState } from 'react'
 import bg from "../../assets/backdropLogin.jpg";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Link } from 'react-router-dom';
 
 const PatientDashboard = ({ isSignedIn, contractId, wallet }) => {
   const [fileURL, setFileURL] = useState("https://gateway.lighthouse.storage/ipfs/Qmba7wM4h6FXUx6SdnqgeKWaXrZEqGZGDajfTw4EVrJ1Lr");
   const [isPublicData, setisPublicData] = useState(false);
   const [userData, setuserData] = useState("");
+  const [records, setrecords] = useState([]);
   const getPatientInfo = async () =>{
     console.log("Checking the Patients status");
     try {
       // return await wallet.viewMethod({ method: 'get_patient', args: { id: wallet.accountId },contractId })
-      const messages = await wallet.viewMethod({ contractId: contractId, method: "get_public_medical_records"});
+      const messages = await wallet.viewMethod({ contractId: contractId, method: "get_patient",args:{id:wallet.accountId}});
       console.log((messages) );
       setuserData(messages.name);
       return messages;
@@ -66,8 +68,9 @@ const PatientDashboard = ({ isSignedIn, contractId, wallet }) => {
     
     try {
       // return await wallet.viewMethod({ method: 'get_patient', args: { id: wallet.accountId },contractId })
-      const messages = await wallet.viewMethod({ contractId: contractId, method: "get_patient_records"});
+      const messages = await wallet.viewMethod({ contractId: contractId, method: "get_public_medical_records"});
       console.log((messages) );
+      setrecords(messages)
       return messages;
     } catch (error) {
       console.log(error);
@@ -117,23 +120,21 @@ const PatientDashboard = ({ isSignedIn, contractId, wallet }) => {
     <section>
         <h3>Medical Records</h3>
         <div className="medical-records">
-            {/* <!-- Add medical record items here --> */}
-            <div className="record-item">
-                <p>Record 1</p>
+          { records.length==0? <div className="record-item">
+                <p>No Record Uploaded yet!</p>
+                {/* <!-- Add more details about the record --> */}
+            </div>:
+            records.map((record,index)=>{
+              return(
+                <div className="record-item" key={index}>
+                <Link to={`${record.record_data}`}><p>Record 1</p></Link> 
                 {/* <!-- Add more details about the record --> */}
             </div>
-            <div className="record-item">
-                <p>Record 2</p>
-                {/* <!-- Add more details about the record --> */}
-            </div>
-            <div className="record-item">
-                <p>Record 3</p>
-                {/* <!-- Add more details about the record --> */}
-            </div>
-            <div className="record-item">
-                <p>Record 4</p>
-                {/* <!-- Add more details about the record --> */}
-            </div>
+              )
+            })
+
+          }
+            
         </div>
     </section>
 </main></div>
