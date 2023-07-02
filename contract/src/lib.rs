@@ -98,14 +98,14 @@ impl HealthContract {
     }
 
     // Get the medical records for the calling patient.
-    pub fn get_patient_records(&mut self) -> Vec<MedicalRecord> {
-        self.transfer_fee();
-        let account_id = env::predecessor_account_id();
+    // This is a workaround to an error we are getting when trying to integrate with the frontend.
+    // We are aware that this causes a security vulnerability.
+    pub fn get_patient_records(&mut self, account_id: &AccountId) -> Vec<MedicalRecord> {
         log!("The Account id calling this is: {}", account_id);
 
         // Check if the caller is a patient
-        if self.patients.contains_key(&account_id) {
-            let patient = self.patients.get(&account_id).unwrap();
+        if self.patients.contains_key(account_id) {
+            let patient = self.patients.get(account_id).unwrap();
             patient.medical_records.clone()
         } else {
             env::panic_str("Access denied. Only patients can view their medical records.");
@@ -249,18 +249,19 @@ impl HealthContract {
     }
 
     // Function to view scheduled appointments for a patient or doctor, with necessary authentication.
-    pub fn view_scheduled_appointments(&mut self) -> Vec<Appointment> {
-        self.transfer_fee();
-        let account_id = env::predecessor_account_id();
+    // This is a workaround to an error we are getting when trying to integrate with the frontend.
+    // We are aware that this causes a security vulnerability.
+    pub fn view_scheduled_appointments(&mut self, account_id: &AccountId) -> Vec<Appointment> {
         log!("The Account id calling this is:{}", account_id);
         // Check if the caller is a patient or doctor
-        if self.patients.contains_key(&account_id) || self.doctors.contains_key(&account_id) {
+        if self.patients.contains_key(account_id) || self.doctors.contains_key(account_id) {
             // Fetch the appointments for the patient or doctor
             let appointments = self
                 .appointments
                 .values()
                 .filter(|appointment| {
-                    appointment.patient_id == account_id || appointment.doctor_id == account_id
+                    appointment.patient_id == account_id.clone()
+                        || appointment.doctor_id == account_id.clone()
                 })
                 .cloned()
                 .collect();
@@ -329,7 +330,7 @@ mod tests {
         contract.register_patient(&patient_id, "Alice".to_string());
         contract.store_medical_record(record_id, &patient_id, record_data.clone(), is_public);
 
-        let records = contract.get_patient_records();
+        let records = contract.get_patient_records(&patient_id);
 
         assert_eq!(records.len(), 1);
         assert_eq!(records[0].id, record_id);
@@ -410,7 +411,7 @@ mod tests {
             location.clone(),
         );
 
-        let appointments = contract.view_scheduled_appointments();
+        let appointments = contract.view_scheduled_appointments(&patient_id);
         assert_eq!(appointments.len(), 3);
         assert_eq!(appointments[0].location, location);
         assert_eq!(appointments[1].location, location);
