@@ -11,7 +11,7 @@ const PatientDashboard = ({ isSignedIn, contractId, wallet }) => {
     console.log("Checking the Patients status");
     try {
       // return await wallet.viewMethod({ method: 'get_patient', args: { id: wallet.accountId },contractId })
-      const messages = await wallet.viewMethod({ contractId: contractId, method: "get_patient", args: { id: wallet.accountId }});
+      const messages = await wallet.viewMethod({ contractId: contractId, method: "get_public_medical_records"});
       console.log((messages) );
       setuserData(messages.name);
       return messages;
@@ -44,23 +44,39 @@ const PatientDashboard = ({ isSignedIn, contractId, wallet }) => {
      console.log(error); 
     }
   }
-  // const uploadFile = async (file) => {
-  //   // Push file to lighthouse node
-  //   // Both file and folder are supported by upload function
-  //   if (true) {
-  //     try {
-  //       const output = await lighthouse.upload(file, "");
-  //       console.log('File Status:', output);
+  const uploadFile = async (file) => {
+    // Push file to lighthouse node
+    // Both file and folder are supported by upload function
+    console.log("File Uploaded");
+    // if (true) {
+    //   try {
+    //     const output = await lighthouse.upload(file, "3e045010.561525b52e304691b6f3e7d0c393e3e5");
+    //     console.log('File Status:', output);
   
-  //       console.log('Visit at https://gateway.lighthouse.storage/ipfs/' + output.data.Hash);
+    //     console.log('Visit at https://gateway.lighthouse.storage/ipfs/' + output.data.Hash);
        
         
-  //       setFileURL(`https://gateway.lighthouse.storage/ipfs/${output.data.Hash}`)
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   }
-  // }
+    //     setFileURL(`https://gateway.lighthouse.storage/ipfs/${output.data.Hash}`)
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // }
+  }
+  const getMedicalRecords = async () =>{
+    
+    try {
+      // return await wallet.viewMethod({ method: 'get_patient', args: { id: wallet.accountId },contractId })
+      const messages = await wallet.viewMethod({ contractId: contractId, method: "get_patient_records"});
+      console.log((messages) );
+      return messages;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  useEffect(() => {
+    getMedicalRecords();
+  }, [])
+  
   return (
     <div><main className="fade-in">
     <section>

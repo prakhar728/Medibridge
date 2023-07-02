@@ -16,6 +16,7 @@ import DoctorDashboard from './pages/DoctorDashboard/DoctorDashboard';
 import PatientRecord from './pages/DoctorDashboard/PatientRecord';
 import PatientLayout from "./pages/PatientDashboard/PatientLayout";
 import About from './pages/About';
+import Contact from "./pages/Contact";
 import PatientDashboard from './pages/PatientDashboard/PatientDashboard';
 const CONTRACT_ADDRESS = 'test1.testingm.testnet' ;
 console.log(CONTRACT_ADDRESS);
@@ -40,6 +41,10 @@ window.onload = async () => {
     {
       path: "/about",
       element: <About />,
+    },
+    {
+      path: "/contact",
+      element: <Contact />,
     },
     {
       path: "/doctor",

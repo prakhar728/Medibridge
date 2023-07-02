@@ -2,7 +2,7 @@ import React from "react";
 import "../assets/global.css";
 import services1 from "../assets/services1.png";
 import services2 from "../assets/services2.png";
-import services3 from "../assets/services2.png";
+import services3 from "../assets/services3.jpg";
 import logo from "../assets/MediBridge_logo.png";
 import { Link } from "react-router-dom";
 const LandingPage = () => {
@@ -51,45 +51,31 @@ const LandingPage = () => {
           {/* <!-- Add more content and features as needed --> */}
         </section>
         {/* <!-- Featured services or benefits section --> */}
-        <section className="featured-services" onClick={showFeatureServices}>
-          <h2>Featured Services</h2>
-          <div className="service">
-            <div className="service-content">
-              <img src={services1} alt="Service 1" />
-              <div className="service-text">
-                <h3>Secure Payment</h3>
-                <p>
-                  Secure payment from patients to doctors based on the service
-                  provided.
-                </p>
+        <div className="accordion">
+          <ul>
+            <li>
+              <div>
+                <img src={services1} alt="Service 1" />
+                <h2>Secure Payment</h2>
+                <p>Secure payment from patients to doctors based on the service provided.</p>
               </div>
-            </div>
-          </div>
-          <div className="service">
-            <div className="service-content">
-              <div className="service-text">
-                <h3>Electronic Health Records</h3>
-                <p>
-                  Access and manage your health records securely online,
-                  anytime, anywhere.
-                </p>
+            </li>
+            <li>
+              <div>
+                <img src={services2} alt="Service 2" />
+                <h2>Electronic Health Records</h2>
+                <p>Access and manage your health records securely online, anytime, anywhere.</p>
               </div>
-              <img src={services2} alt="Service 2" />
-            </div>
-          </div>
-          <div className="service">
-            <div className="service-content">
-              <img src={services3} alt="Service 3" />
-              <div className="service-text">
-                <h3>Appointment Scheduling</h3>
-                <p>
-                  Book and manage appointments with healthcare providers in Link
-                  convenient and hassle-free way.
-                </p>
+            </li>
+            <li>
+              <div>
+                <img src={services3} alt="Service 3" />
+                <h2>Appointment Scheduling</h2>
+                <p>Book and manage appointments with healthcare providers in a convenient and hassle-free way.</p>
               </div>
-            </div>
-          </div>
-        </section>
+            </li>
+          </ul>
+        </div>
       </main>
       <footer className="fade-in">
         <ul className="footer-links">
