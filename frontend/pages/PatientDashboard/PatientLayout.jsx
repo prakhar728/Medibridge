@@ -21,7 +21,7 @@ const DoctorLayout = ({ isSignedIn, contractId, wallet }) => {
   }
   useEffect(() => {
     if(isSignedIn)
-    checkDoctorStatus();
+    checkPatientStatus();
   }, [])
 
   return (

@@ -341,4 +341,20 @@ footer {
 
 
 
+/* SIGN IN UI WORK */
+
+.SignInPrompt{
+  width: 40vw;
+  margin: auto;
+  height: 50vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.SignInContent{
+  border:2px solid black;
+  width: 100%;
+  padding:0 5%;
+  border-radius: 8px;
+}
 

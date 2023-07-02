@@ -2,7 +2,8 @@ import React from 'react';
 
 export function SignInPrompt({ onClick}) {
   return (
-    <main>
+    <main className='SignInPrompt'>
+      <div className='SignInContent'>
       <h3>
         Welcome to MediBridge!
       </h3>
@@ -13,6 +14,8 @@ export function SignInPrompt({ onClick}) {
       <p style={{ textAlign: 'center' }}>
         <button onClick={onClick}>Sign in with your NEAR Wallet</button>
       </p>
+      </div>
+
     </main>
   );
 }
