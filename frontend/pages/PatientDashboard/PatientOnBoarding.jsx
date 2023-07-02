@@ -1,6 +1,6 @@
 import React from 'react'
 
-const PatientOnBoarding = () => {
+const PatientOnBoarding = ({ isSignedIn, contractId, wallet }) => {
   return (
     <div>PatientOnBoarding</div>
   )

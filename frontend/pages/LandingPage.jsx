@@ -20,13 +20,13 @@ const LandingPage = () => {
       <nav className="fade-in">
         <ul className="navigation-bar">
           <li>
-            <Link to="index.html">Home</Link>
+            <Link to={"/"}>Home</Link>
           </li>
           <li>
-            <Link to="about.html">About</Link>
+            <Link to={"/about"}>About</Link>
           </li>
           <li>
-            <Link to="contact.html">Contact</Link>
+            <Link to={"/contact"}>Contact</Link>
           </li>
         </ul>
       </nav>
@@ -38,8 +38,8 @@ const LandingPage = () => {
       <div className="user-authentication fade-in">
         {/* <!-- Show login or account-related links here --> */}
         <div className="login-signup">
-          <Link to={'doctor/dashboard'}>Login as Link Doctor</Link>
-          <Link to="patient.html">Login as Link Patient</Link>
+          <Link to={'doctor/dashboard'}>Login as a Doctor</Link>
+          <Link to={'patient/dashboard'}>Login as a Patient</Link>
         </div>
         {/* <!-- Display user name or profile picture here after authentication --> */}
         {/* <!-- User dropdown menu for account settings and logout --> */}

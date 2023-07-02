@@ -14,7 +14,8 @@ import LandingPage from './pages/LandingPage';
 import DoctorLayout from './pages/DoctorDashboard/DoctorLayout';
 import DoctorDashboard from './pages/DoctorDashboard/DoctorDashboard';
 import PatientRecord from './pages/DoctorDashboard/PatientRecord';
-
+import PatientLayout from "./pages/PatientDashboard/PatientLayout";
+import About from './pages/About';
 const CONTRACT_ADDRESS = 'test1.testingm.testnet' ;
 console.log(CONTRACT_ADDRESS);
 
@@ -34,6 +35,11 @@ window.onload = async () => {
       path: "/",
       element: <LandingPage />,
     },
+    
+    {
+      path: "/about",
+      element: <About />,
+    },
     {
       path: "/doctor",
       element: <DoctorLayout isSignedIn={isSignedIn} contractId={CONTRACT_ADDRESS} wallet={wallet}/>,
@@ -47,6 +53,20 @@ window.onload = async () => {
           element: <PatientRecord  isSignedIn={isSignedIn} contractId={CONTRACT_ADDRESS} wallet={wallet}/>,
         },
       ]
+    },
+    {
+      path: "/patient",
+      element: <PatientLayout isSignedIn={isSignedIn} contractId={CONTRACT_ADDRESS} wallet={wallet}/>,
+      // children:[
+      //   {
+      //     path: "dashboard",
+      //     element: <Patiet  isSignedIn={isSignedIn} contractId={CONTRACT_ADDRESS} wallet={wallet}/>,
+      //   },
+      //   {
+      //     path: "patientrecord/:patientid",
+      //     element: <PatientRecord  isSignedIn={isSignedIn} contractId={CONTRACT_ADDRESS} wallet={wallet}/>,
+      //   },
+      // ]
     },
     {
       path: "/app",
