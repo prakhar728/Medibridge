@@ -9,7 +9,7 @@ const DoctorOnboarding = ({ isSignedIn, contractId, wallet }) => {
   const onboardDoctor = async (e) =>{
     e.preventDefault();
     try {
-      wallet.callMethod({ method: 'register_doctor', args: {id:wallet.accountId, name: userName,fee:parseInt(fee) }, contractId })
+      wallet.callMethod({ method: 'register_doctor', args: {id:wallet.accountId, name: userName,fee:parseFloat(fee) }, contractId })
       .then(async () => {console.log("Registered");
       toast("Registered");
     })

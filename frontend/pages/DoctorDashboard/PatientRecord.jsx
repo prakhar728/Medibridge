@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { useParams } from "react-router-dom";
 
 export async function loader() {
@@ -9,6 +10,8 @@ export async function loader() {
 const PatientRecord = ({ isSignedIn, contractId, wallet }) => {
   let { patientid } = useParams();
   const [patientDetails, setPatientDetails] = useState("");
+  const [fileURL, setFileURL] = useState("https://gateway.lighthouse.storage/ipfs/Qmba7wM4h6FXUx6SdnqgeKWaXrZEqGZGDajfTw4EVrJ1Lr");
+  const [isPublicData, setisPublicData] = useState(false);
   console.log(patientid);
   const getPatientInfo = async () => {
     console.log("Gather Patients Info");
@@ -26,8 +29,17 @@ const PatientRecord = ({ isSignedIn, contractId, wallet }) => {
       console.log(error);
     }
   };
-
-
+  const uploadRecord = async (e) =>{
+    e.preventDefault();
+    try {
+      wallet.callMethod({ method: 'store_medical_record', args: {id:generateRandomId(), patient_id:patientDetails.id, record_data:fileURL,is_public:isPublicData }, contractId })
+      .then(async () => {console.log("Record Stored");
+      toast("Record Stored");
+    })
+    } catch (error) {
+     console.log(error); 
+    }
+  }
   useEffect(() => {
     
   
@@ -46,9 +58,9 @@ const PatientRecord = ({ isSignedIn, contractId, wallet }) => {
           
           <div className="patient-details">
             <p>
-              Name: <span className="patient-name">[Patient Name]</span>
+              Name: <span className="patient-name">{patientDetails.name}</span>
             </p>
-            <p>
+            {/* <p>
               Age: <span className="patient-age">[Patient Age]</span>
             </p>
             <p>
@@ -57,7 +69,7 @@ const PatientRecord = ({ isSignedIn, contractId, wallet }) => {
             <p>
               Address:{" "}
               <span className="patient-address">[Patient Address]</span>
-            </p>
+            </p> */}
             {/* <!-- Add more patient information here --> */}
           </div>
         </section>
@@ -66,17 +78,18 @@ const PatientRecord = ({ isSignedIn, contractId, wallet }) => {
           <h3>Upload Medical Records</h3>
           <form
             id="upload-form"
-            action="#"
-            method="post"
-            encType="multipart/form-data"
+           
           >
             <input
               type="file"
               name="file"
               id="file"
-              accept=".pdf, .doc, .docx"
             />
-            <button type="submit">Upload</button>
+            <label>Make your data available to the public?</label>
+            <input type="checkbox" placeholder='Make your data available to the public?' checked={isPublicData} onChange={e=>{
+              setisPublicData(!isPublicData);
+            }}/>
+            <button type="submit" onClick={uploadRecord}>Upload</button>
           </form>
         </section>
 
@@ -84,14 +97,20 @@ const PatientRecord = ({ isSignedIn, contractId, wallet }) => {
           <h3>Medical Records</h3>
           <div className="medical-records">
             {/* <!-- Add medical record items here --> */}
-            <div className="record-item">
-              <p>Record 1</p>
-              {/* <!-- Add more details about the record --> */}
+            {!patientDetails &&  patientDetails.medical_records.length==0? <div className="record-item">
+                <p>No Record Uploaded yet!</p>
+                {/* <!-- Add more details about the record --> */}
+            </div>:
+            patientDetails.medical_records.map((record,index)=>{
+              return(
+                <div className="record-item" key={index}>
+                <Link to={`${record.record_data}`}><p>Record ${index}</p></Link> 
+                {/* <!-- Add more details about the record --> */}
             </div>
-            <div className="record-item">
-              <p>Record 2</p>
-              {/* <!-- Add more details about the record --> */}
-            </div>
+              )
+            })
+
+          }
           </div>
         </section>
       </main>

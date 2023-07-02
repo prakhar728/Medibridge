@@ -16,6 +16,8 @@ const PatientDashboard = ({ isSignedIn, contractId, wallet }) => {
       const messages = await wallet.viewMethod({ contractId: contractId, method: "get_patient",args:{id:wallet.accountId}});
       console.log((messages) );
       setuserData(messages.name);
+      setrecords(messages.medical_records)
+
       return messages;
     } catch (error) {
       console.log(error);
@@ -64,21 +66,20 @@ const PatientDashboard = ({ isSignedIn, contractId, wallet }) => {
     //   }
     // }
   }
-  const getMedicalRecords = async () =>{
-    
-    try {
-      // return await wallet.viewMethod({ method: 'get_patient', args: { id: wallet.accountId },contractId })
-      const messages = await wallet.viewMethod({ contractId: contractId, method: "get_public_medical_records"});
-      console.log((messages) );
-      setrecords(messages)
-      return messages;
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  useEffect(() => {
-    getMedicalRecords();
-  }, [])
+  // const getMedicalRecords = async () =>{
+  //   try {
+  //     // return await wallet.viewMethod({ method: 'get_patient', args: { id: wallet.accountId },contractId })
+  //     const messages = await wallet.viewMethod({ contractId: contractId, method: "get_patient_records",args:{account_id:wallet.accountId}});
+  //     console.log((messages) );
+  //     setrecords(messages)
+  //     return messages;
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
+  // useEffect(() => {
+  //   getMedicalRecords();
+  // }, [])
   
   return (
     <div><main className="fade-in">
@@ -127,7 +128,7 @@ const PatientDashboard = ({ isSignedIn, contractId, wallet }) => {
             records.map((record,index)=>{
               return(
                 <div className="record-item" key={index}>
-                <Link to={`${record.record_data}`}><p>Record 1</p></Link> 
+                <Link to={`${record.record_data}`}><p>Record ${index}</p></Link> 
                 {/* <!-- Add more details about the record --> */}
             </div>
               )
