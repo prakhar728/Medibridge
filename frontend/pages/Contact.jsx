@@ -31,10 +31,6 @@ const Contact = () => {
                             <h3>Phone</h3>
                             <p>+1 (123) 456-7890</p>
                         </div>
-                        <div className="contact-item">
-                            <h3>Address</h3>
-                            <p>123 Medical Avenue, City, Country</p>
-                        </div>
                     </div>
                     <h3>Send us a message</h3>
                     <form id="contact-form" action="#" method="post">

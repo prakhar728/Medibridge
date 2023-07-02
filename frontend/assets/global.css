@@ -297,6 +297,81 @@ section.search-patients {
 
 
 /*END: ABOUT Styles */
+/* CONTACT Styles */
+.contact-us {
+  text-align: center;
+  padding: 50px;
+}
+
+.contact-us h2 {
+  color: #8B4513;
+}
+
+.contact-us p {
+  margin-bottom: 20px;
+}
+
+.contact-info {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+
+.contact-item {
+  margin: 0 20px;
+}
+
+.contact-item h3 {
+  color: #8B4513;
+}
+
+.contact-item p {
+  margin: 10px 0;
+}
+
+#contact-form {
+  text-align: left;
+}
+
+#contact-form div {
+  margin-bottom: 20px;
+}
+
+#contact-form label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+#contact-form input,
+#contact-form textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+#contact-form textarea {
+  resize: vertical;
+  height: 120px;
+}
+
+#contact-form button[type="submit"] {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  background-color: #8B4513;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#contact-form button[type="submit"]:hover {
+  background-color: #654321;
+}
+/* END: CONTACT US page */
 /* Footer styles */
 footer {
   background-color: #333;
