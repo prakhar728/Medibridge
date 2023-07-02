@@ -249,7 +249,8 @@ impl HealthContract {
     }
 
     // Function to view scheduled appointments for a patient or doctor, with necessary authentication.
-    pub fn view_scheduled_appointments(&self) -> Vec<Appointment> {
+    pub fn view_scheduled_appointments(&mut self) -> Vec<Appointment> {
+        self.transfer_fee();
         let account_id = env::predecessor_account_id();
         log!("The Account id calling this is:{}", account_id);
         // Check if the caller is a patient or doctor
