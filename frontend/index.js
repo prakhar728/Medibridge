@@ -40,11 +40,11 @@ window.onload = async () => {
       children:[
         {
           path: "dashboard",
-          element: <DoctorDashboard />,
+          element: <DoctorDashboard  isSignedIn={isSignedIn} contractId={CONTRACT_ADDRESS} wallet={wallet}/>,
         },
         {
           path: "patientrecord/:patientid",
-          element: <PatientRecord />,
+          element: <PatientRecord  isSignedIn={isSignedIn} contractId={CONTRACT_ADDRESS} wallet={wallet}/>,
         },
       ]
     },
