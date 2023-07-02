@@ -2,7 +2,7 @@ import React from "react";
 import "../assets/global.css";
 import services1 from "../assets/services1.png";
 import services2 from "../assets/services2.png";
-import services3 from "../assets/services2.png";
+import services3 from "../assets/services3.jpg";
 import logo from "../assets/MediBridge_logo.png";
 import { Link } from "react-router-dom";
 const LandingPage = () => {
