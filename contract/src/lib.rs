@@ -98,7 +98,8 @@ impl HealthContract {
     }
 
     // Get the medical records for the calling patient.
-    pub fn get_patient_records(&self) -> Vec<MedicalRecord> {
+    pub fn get_patient_records(&mut self) -> Vec<MedicalRecord> {
+        self.transfer_fee();
         let account_id = env::predecessor_account_id();
         log!("The Account id calling this is: {}", account_id);
 
