@@ -1,16 +1,39 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {useNavigate} from "react-router-dom";
+
 const DoctorDashboard = ({ isSignedIn, contractId, wallet }) => {
   const [patientId, setpatientId] = useState("");
+  const [name, setname] = useState("");
+  const [appointments, setappointments] = useState([]);
   let navigate = useNavigate();
   const goToPatient = (e) =>{
     e.preventDefault();
     navigate(`/doctor/patientrecord/${patientId}`);
   }
+  const gatherAppointments = async() =>{
+    console.log("Getting the Appointments");
+    try {
+      const messages = await wallet.viewMethod({ contractId: contractId, method: "get_doctor", args: { id: wallet.accountId }});
+      console.log((messages) );
+      if(messages){
+        setname(messages.name);
+      }
+
+      const appointmentsArr  = await wallet.callMethod({ contractId: contractId, method: "view_scheduled_appointments"});
+      console.log(appointmentsArr);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  useEffect(() => {
+    gatherAppointments();
+  }, [])
+  
   return (
-    <div><main className="fade-in">
+    <div>
+      <main className="fade-in">
     <section>
-      <h2>Welcome, Doctor Name</h2>
+      <h2>Welcome, {name}</h2>
     </section>
     <section>
       <h3>Search Patients</h3>

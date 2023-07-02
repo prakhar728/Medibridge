@@ -9,8 +9,8 @@ const DoctorLayout = ({ isSignedIn, contractId, wallet }) => {
     console.log("Checking the Doctors status");
     try {
       // return await wallet.viewMethod({ method: 'get_patient', args: { id: wallet.accountId },contractId })
-      const messages = await wallet.viewMethod({ contractId: contractId, method: "get_patient", args: { id: wallet.accountId }});
-      console.log(JSON.parse(messages) );
+      const messages = await wallet.viewMethod({ contractId: contractId, method: "get_doctor", args: { id: wallet.accountId }});
+      console.log((messages) );
       setisADoctor(true);
       return messages;
     } catch (error) {
@@ -41,7 +41,7 @@ const DoctorLayout = ({ isSignedIn, contractId, wallet }) => {
       </nav>
  
       {!isSignedIn ?  <SignInPrompt  onClick={() => wallet.signIn()}/> :
-      isADoctor?<Outlet />: <DoctorOnboarding />
+      isADoctor?<Outlet />: <DoctorOnboarding isSignedIn={isSignedIn} contractId={contractId} wallet={wallet} />
       
     }
       <footer className="fade-in">
