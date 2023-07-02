@@ -79,17 +79,17 @@ const LandingPage = () => {
       </main>
       <footer className="fade-in">
         <ul className="footer-links">
-          <li>
-            <Link to="terms.html">Terms of Service</Link>
+        <li>
+            <Link to={"/"}>Terms of Service</Link>
           </li>
           <li>
-            <Link to="privacy.html">Privacy Policy</Link>
+            <Link to={"/"}>Privacy Policy</Link>
           </li>
           <li>
-            <Link to="about.html">About Us</Link>
+            <Link to={"/about"}>About Us</Link>
           </li>
           <li>
-            <Link to="contact.html">Contact Us</Link>
+            <Link to={"/contact"}>Contact Us</Link>
           </li>
         </ul>
       </footer>

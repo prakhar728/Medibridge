@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useParams } from "react-router-dom";
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 export async function loader() {
   const patientRecord = await getContacts();
   return { contacts };
@@ -13,6 +14,19 @@ const PatientRecord = ({ isSignedIn, contractId, wallet }) => {
   const [fileURL, setFileURL] = useState("https://gateway.lighthouse.storage/ipfs/Qmba7wM4h6FXUx6SdnqgeKWaXrZEqGZGDajfTw4EVrJ1Lr");
   const [isPublicData, setisPublicData] = useState(false);
   console.log(patientid);
+
+
+  function generateRandomId() {
+    const min = 10000; // Minimum value (inclusive)
+    const max = 99999; // Maximum value (inclusive)
+  
+    // Generate a random number between min and max (inclusive)
+    const randomId = Math.floor(Math.random() * (max - min + 1)) + min;
+  
+    return randomId;
+  }
+
+
   const getPatientInfo = async () => {
     console.log("Gather Patients Info");
     try {
@@ -31,6 +45,7 @@ const PatientRecord = ({ isSignedIn, contractId, wallet }) => {
   };
   const uploadRecord = async (e) =>{
     e.preventDefault();
+    toast("Uploading The Medical Records for the patient")
     try {
       wallet.callMethod({ method: 'store_medical_record', args: {id:generateRandomId(), patient_id:patientDetails.id, record_data:fileURL,is_public:isPublicData }, contractId })
       .then(async () => {console.log("Record Stored");
@@ -51,6 +66,7 @@ const PatientRecord = ({ isSignedIn, contractId, wallet }) => {
   }
   return (
     <div>
+      <ToastContainer />
       <main className="fade-in">
         <section>
           <h2>Patient Information</h2>
@@ -104,7 +120,7 @@ const PatientRecord = ({ isSignedIn, contractId, wallet }) => {
             patientDetails.medical_records.map((record,index)=>{
               return(
                 <div className="record-item" key={index}>
-                <Link to={`${record.record_data}`}><p>Record ${index}</p></Link> 
+                <Link to={`${record.record_data}`}><p>Record {index+1}</p></Link> 
                 {/* <!-- Add more details about the record --> */}
             </div>
               )

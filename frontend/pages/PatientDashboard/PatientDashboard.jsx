@@ -39,6 +39,7 @@ const PatientDashboard = ({ isSignedIn, contractId, wallet }) => {
   }
   const uploadRecord = async (e) =>{
     e.preventDefault();
+    toast("Uploading the records");
     try {
       wallet.callMethod({ method: 'store_medical_record', args: {id:generateRandomId(), patient_id:wallet.accountId, record_data:fileURL,is_public:isPublicData }, contractId })
       .then(async () => {console.log("Record Stored");
@@ -82,7 +83,9 @@ const PatientDashboard = ({ isSignedIn, contractId, wallet }) => {
   // }, [])
   
   return (
-    <div><main className="fade-in">
+    <div>
+      <ToastContainer />
+      <main className="fade-in">
     <section>
         <h2>Personal Information</h2>
         <div className="patient-details">
@@ -128,7 +131,7 @@ const PatientDashboard = ({ isSignedIn, contractId, wallet }) => {
             records.map((record,index)=>{
               return(
                 <div className="record-item" key={index}>
-                <Link to={`${record.record_data}`}><p>Record ${index}</p></Link> 
+                <Link to={`${record.record_data}`}><p>Record {index+1}</p></Link> 
                 {/* <!-- Add more details about the record --> */}
             </div>
               )
