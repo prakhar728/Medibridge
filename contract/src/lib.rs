@@ -70,6 +70,8 @@ pub struct Appointment {
 #[near_bindgen]
 impl HealthContract {
     // Get patient information by account ID.
+    // This is a workaround to an error we are getting when trying to integrate with the frontend.
+    // We are aware that this causes a security vulnerability.
     #[handle_result]
     pub fn get_patient(&self, id: &AccountId) -> Result<&Patient, &str> {
         require!(
@@ -84,6 +86,8 @@ impl HealthContract {
     }
 
     // Get doctor information by account ID.
+    // This is a workaround to an error we are getting when trying to integrate with the frontend.
+    // We are aware that this causes a security vulnerability.
     #[handle_result]
     pub fn get_doctor(&self, id: &AccountId) -> Result<&Doctor, &str> {
         require!(
