@@ -18,7 +18,7 @@ import PatientLayout from "./pages/PatientDashboard/PatientLayout";
 import About from './pages/About';
 import Contact from "./pages/Contact";
 import PatientDashboard from './pages/PatientDashboard/PatientDashboard';
-const CONTRACT_ADDRESS = process.env.CONTRACT_NAME;
+const CONTRACT_ADDRESS = process.env.CONTRACT_NAME || "dev-1688297327576-65746263435730";
 console.log(CONTRACT_ADDRESS);
 
 // When creating the wallet you can optionally ask to create an access key
