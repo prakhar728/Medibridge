@@ -1,6 +1,8 @@
 MediBridge
 ===========
-
+<p align="center">
+  <img src="frontend/assets/MediBridge_logo.png" alt="Image">
+</p>
 The goal of MediBridge is to develop a decentralized system that facilitates the connection between patients and doctors in the healthcare domain. By leveraging blockchain technology, the project aims to create a secure, transparent, and efficient platform where patients can easily find and connect with doctors while maintaining control over their medical data.
 
 Background
