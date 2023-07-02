@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 export async function loader() {
@@ -8,24 +8,55 @@ export async function loader() {
 
 const PatientRecord = ({ isSignedIn, contractId, wallet }) => {
   let { patientid } = useParams();
+  const [patientDetails, setPatientDetails] = useState("");
   console.log(patientid);
+  const getPatientInfo = async () => {
+    console.log("Gather Patients Info");
+    try {
+      // return await wallet.viewMethod({ method: 'get_patient', args: { id: wallet.accountId },contractId })
+      const messages = await wallet.viewMethod({
+        contractId: contractId,
+        method: "get_patient",
+        args: { id: patientid },
+      });
+      console.log(messages);
+      setPatientDetails(messages);
+      return messages;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
+  useEffect(() => {
+    
+  
+    getPatientInfo();
+  }, [])
+  
+  if(patientDetails===""){
+    return <div>Patient hasn't been registered with us yet!</div>
+  }
   return (
     <div>
-      <main class="fade-in">
+      <main className="fade-in">
         <section>
           <h2>Patient Information</h2>
-          <div class="patient-details">
+
+          
+          <div className="patient-details">
             <p>
-              Name: <span class="patient-name">[Patient Name]</span>
+              Name: <span className="patient-name">[Patient Name]</span>
             </p>
             <p>
-              Age: <span class="patient-age">[Patient Age]</span>
+              Age: <span className="patient-age">[Patient Age]</span>
             </p>
             <p>
-              Gender: <span class="patient-gender">[Patient Gender]</span>
+              Gender: <span className="patient-gender">[Patient Gender]</span>
             </p>
             <p>
-              Address: <span class="patient-address">[Patient Address]</span>
+              Address:{" "}
+              <span className="patient-address">[Patient Address]</span>
             </p>
             {/* <!-- Add more patient information here --> */}
           </div>
@@ -37,7 +68,7 @@ const PatientRecord = ({ isSignedIn, contractId, wallet }) => {
             id="upload-form"
             action="#"
             method="post"
-            enctype="multipart/form-data"
+            encType="multipart/form-data"
           >
             <input
               type="file"
@@ -51,13 +82,13 @@ const PatientRecord = ({ isSignedIn, contractId, wallet }) => {
 
         <section>
           <h3>Medical Records</h3>
-          <div class="medical-records">
+          <div className="medical-records">
             {/* <!-- Add medical record items here --> */}
-            <div class="record-item">
+            <div className="record-item">
               <p>Record 1</p>
               {/* <!-- Add more details about the record --> */}
             </div>
-            <div class="record-item">
+            <div className="record-item">
               <p>Record 2</p>
               {/* <!-- Add more details about the record --> */}
             </div>
